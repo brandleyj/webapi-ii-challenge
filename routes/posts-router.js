@@ -12,7 +12,7 @@ router.post("/", (req, res) => {
 		});
 	} else {
 		posts
-			.insert(postData)
+			.insert(postInfo)
 			.then(post => {
 				res.status(201).json(post);
 			})
@@ -27,7 +27,7 @@ router.post("/", (req, res) => {
 router.get("/", (req, res) => {
 	posts
 		.find()
-		.then(post => res.json(post))
+		.then(post => res.status(200).json(post))
 		.catch(error =>
 			res.status(500).json({
 				error: "The posts information could not be retrieved."
@@ -37,20 +37,18 @@ router.get("/", (req, res) => {
 
 router.get("/:id", (req, res) => {
 	const id = req.params.id;
-	posts
-		.findById(id)
-		.then(postsById => {
-			if (postsById) {
-				res.json(postsById);
-			} else {
-				res.status(404).json({
-					message: "The post with the specified ID does not exist."
-				});
-			}
-		})
-		.catch(error =>
-			res
-				.status(500)
-				.json({ error: "The post information could not be retrieved." })
-		);
+	if (!id) {
+		res
+			.status(404)
+			.json({ message: "The post with the specified ID does not exist." });
+	} else {
+		posts
+			.findById(id)
+			.then(post => res.status(200).json(post))
+			.catch(error =>
+				res.status(500).json({
+					error: "The post information could not be retrieved"
+				})
+			);
+	}
 });
